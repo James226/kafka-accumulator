@@ -1,0 +1,32 @@
+version: '3'
+
+networks:
+  kafka-accumulator:
+    driver: bridge
+
+services:
+  zookeeper:
+    extends:
+      file: ../dependencies.yml
+      service: zookeeper
+  kafka:
+    extends:
+      file: ../dependencies.yml
+      service: kafka
+    depends_on:
+      - zookeeper
+  redis:
+    image: 'redis:latest'
+    networks:
+      - kafka-accumulator
+    ports:
+      - '6379:6379'
+  accumulator:
+    build: .
+    networks:
+      - kafka-accumulator
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_started

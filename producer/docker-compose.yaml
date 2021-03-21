@@ -1,0 +1,24 @@
+version: '3'
+
+networks:
+  kafka-accumulator:
+    driver: bridge
+
+services:
+  zookeeper:
+    extends:
+      file: ../dependencies.yml
+      service: zookeeper
+  kafka:
+    extends:
+      file: ../dependencies.yml
+      service: kafka
+    depends_on:
+      - zookeeper
+  producer:
+    build: .
+    networks:
+      - kafka-accumulator
+    depends_on:
+      kafka:
+        condition: service_healthy
